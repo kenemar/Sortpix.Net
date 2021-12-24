@@ -60,9 +60,8 @@ namespace SortPix.ViewModels
                 if (Directory.Exists(JobFolderPath))
                 {
                     Task.Run(() => GetPhotoPathsAsync(JobFolderPath));
-                    //Task.Run(() => { Dispatcher.InvokeAsync(() => LongOperation())});
-                    MonitorDestDir();
-                    //GetPhotoPathsAsync(JobFolderPath);                   
+
+                    MonitorDestDir();                   
                 }
                 else PhotoPaths = new ObservableCollection<string>();           
             }
@@ -213,27 +212,7 @@ namespace SortPix.ViewModels
         }
         private void OnCreated(object sender, FileSystemEventArgs e)
         {
-            //string value = $"Created: {e.FullPath}";
-            //Console.WriteLine("new File: " + value);
-            //MessageBox.Show("New File: " + value);
-            //File.Move(e.FullPath, PhotoFolderPath + "\\" + e.Name);
-
-            //int index = 0;
-            //while(index < 5)
-            //{
-            //    if (!IsFileLocked(e.FullPath) && !File.Exists(PhotoFolderPath + "\\" + e.Name))
-            //    {
-            //        System.Threading.Thread.Sleep(1000);
-            //        File.Move(e.FullPath, PhotoFolderPath + "\\" + e.Name);
-            //        return;
-            //    }
-            //    index++;
-            //    System.Threading.Thread.Sleep(200);
-            //}
-            //System.Threading.Thread.Sleep(1000);
-            //File.Move(e.FullPath, PhotoFolderPath + "\\" + e.Name);
             Task.Run(() => MovePhoto(e.FullPath, PhotoFolderPath + "\\" + e.Name));
-            //MessageBox.Show("hey, new pic");
         }
 
         private void OnDeleted(object sender, FileSystemEventArgs e)
@@ -244,7 +223,6 @@ namespace SortPix.ViewModels
         {
             try
             {
-                //using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
                 using (FileStream stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
                     stream.Close();
@@ -268,7 +246,6 @@ namespace SortPix.ViewModels
                     System.Threading.Thread.Sleep(1000);
                     File.Move(sourceFilePath, destFilePath);
                     Task.Run(() => GetPhotoPathsAsync(JobFolderPath));
-                    //OnPropertyChanged(nameof(PhotoPaths));
                     sourceDirWatcher.EnableRaisingEvents = true;
                     return;
                 }

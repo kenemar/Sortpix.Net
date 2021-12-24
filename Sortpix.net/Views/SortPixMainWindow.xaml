@@ -134,11 +134,7 @@
                                     <Grid.InputBindings>
                                         <MouseBinding Gesture="LeftDoubleClick" Command="{Binding ElementName=MainGrid, Path=DataContext.OpenSelectedPhotoCommand}"/>
                                     </Grid.InputBindings>
-                                    <!--<Image Width="120" Source="{Binding}"/>-->
                                     <Image Height="67" HorizontalAlignment="Center" Source="{Binding Converter={StaticResource uriToImageConv}}">
-                                        <!--<Image.Source>
-                                            <BitmapImage DecodePixelHeight="50" UriSource="{Binding Converter={StaticResource uriToImageConv}}" />
-                                        </Image.Source>-->
                                     </Image>
                                 </Grid>
                                 
