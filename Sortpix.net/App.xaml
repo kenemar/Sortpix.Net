@@ -1,0 +1,9 @@
+﻿<Application x:Class="Sortpix.net.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Sortpix.net"
+             StartupUri="Views\SortPixMainWindow.xaml">
+    <Application.Resources>
+        <local:UriToCachedImageConverter x:Key="uriToImageConv"></local:UriToCachedImageConverter>
+    </Application.Resources>
+</Application>

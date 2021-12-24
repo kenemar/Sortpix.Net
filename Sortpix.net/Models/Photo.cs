@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using SortPix.ViewModels;
+using SortPix.Commands;
+
+namespace SortPix.Models
+{
+    public class Photo
+    {
+        //public Photo(string[] photosList)
+        //{
+        //    OpenSelectedPhotoCommand = new OpenSelectedPhotoCommand(SortPixMainWindowsVM);
+        //}
+        public string Path { get; set; }
+        public ICommand OpenSelectedPhotoCommand { get; set; }
+
+    }
+}
