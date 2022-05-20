@@ -18,8 +18,9 @@ namespace SortPix.ViewModels
 {
     public class SortPixMainWindowsVM : INotifyPropertyChanged
     {
-        public SortPixMainWindowsVM()
+        public SortPixMainWindowsVM()   //ViewModelConstructor
         {
+            //Load user preferences from Saved Settings
             SourceDirPath = Properties.Settings1.Default.SourceDirPath;
             JobFolderParentDirPath = Properties.Settings1.Default.JobFolderParentDirPath;
             JobNumberPrefix = Properties.Settings1.Default.JobNumberPrefix;
@@ -28,6 +29,7 @@ namespace SortPix.ViewModels
             MoveToSubfolder = Properties.Settings1.Default.MoveToSubfolder;
             StartAtRight = Properties.Settings1.Default.StartAtRight;
 
+            //Initialize ICommands
             OpenSelectedPhotoCommand = new OpenSelectedPhotoCommand(this);
             OpenJobFolderCommand = new OpenJobFolderCommand(this);
             BrowseSourceDirCommand = new BrowseSourceDirCommand(this);
@@ -36,20 +38,23 @@ namespace SortPix.ViewModels
             JobNumberDelCharCommand = new JobNumberDelCharCommand(this);
             ExitCommand = new ExitCommand(this);
 
+            //Start file watchers on Source and Destination folders
             MonitorSourceDir();
             MonitorDestDir();
 
         }
         #region Private Fields
+        //private backing fields for public properties
         private ObservableCollection<string> _photoPaths;
         private string _sourceDirPath;
         private string _jobNumber;
         private bool _pathsValid;
+        //Potential names for Pictures subfolder in job folder
         private readonly string[] JobPhotoLocations = { "\\pictures", "\\photos", "\\pics" };
         #endregion
 
         #region Public Properties
-        public string JobNumber
+        public string JobNumber         //Job Number property
         {
             get => _jobNumber;
             set
@@ -57,16 +62,19 @@ namespace SortPix.ViewModels
                 _jobNumber = value;
                 OnPropertyChanged(nameof(PathsValid));
                 OnPropertyChanged(nameof(PathsValidColor));
+                //if Paths and Job Number is valid, start a thread to retreive recent photos from job folder
                 if (Directory.Exists(JobFolderPath))
                 {
                     Task.Run(() => GetPhotoPathsAsync(JobFolderPath));
 
+                    //Start monitoring in case it's not running
                     MonitorDestDir();                   
                 }
+                //If Job Number not valid, return empty ObservableCollection
                 else PhotoPaths = new ObservableCollection<string>();           
             }
         }
-        public string PathsValid
+        public string PathsValid        //Message to show whether Paths and Job Number are valid (ready to copy)
         {
             get
             {
@@ -84,7 +92,7 @@ namespace SortPix.ViewModels
                 }   
             }
         }
-        public Brush PathsValidColor
+        public Brush PathsValidColor    //Brush property to set color of PathsValid Message  
         {
             get
             {
@@ -98,12 +106,13 @@ namespace SortPix.ViewModels
                 }
             }
         }
-        public string SourceDirPath
+        public string SourceDirPath     //Path to source directory (Camera Roll)
         {
             get => _sourceDirPath;
             set
             {
                 _sourceDirPath = value;
+                //If FileWatcher is not null, set the Path field to the selected Path; otherwise start monitoring
                 if(sourceDirWatcher != null)
                 {
                     sourceDirWatcher.Path = value;
@@ -113,10 +122,10 @@ namespace SortPix.ViewModels
                 }
             }
         }
-        public string JobFolderParentDirPath { get; set; }
-        public string JobNumberPrefix { get; set; }
-        public string JobNumberSuffix { get; set; }
-        public string JobFolderPath
+        public string JobFolderParentDirPath { get; set; }  //Path to folder that contains the Job folders
+        public string JobNumberPrefix { get; set; }         //Anything coming before the numerical part of the job number in the file path
+        public string JobNumberSuffix { get; set; }         //Anything coming after the numerical part of the job number in the file path
+        public string JobFolderPath         //Build the Full Job Folder Path by combining Parent directory path, preffix and suffix
         {
             get
             {
@@ -124,26 +133,29 @@ namespace SortPix.ViewModels
             }
 
         }
-        public string PhotoFolderPath
+        public string PhotoFolderPath       //Location to actually copy the pictures to (Job folder or Pictures subfolder)
         {
             get
             {
-                if (!MoveToSubfolder) { return JobFolderPath; }
+                if (!MoveToSubfolder) { return JobFolderPath; }     //If MovetoSubfolder is not selected, just return JobFolderPath
                 else
                 {
+                    //Otherwise loop through possible names for Pictures subfolder
                     foreach(string location in JobPhotoLocations)
                     {
+                        //if there are any matches, return Job folder + subfolder name
                         if (Directory.Exists(JobFolderPath + location))
                         {
                             return JobFolderPath + location;
                         }
                     }
+                    //If no matches, created a subfolder called Pictures and return JobFolder path + Pictures
                     _ = Directory.CreateDirectory(JobFolderPath + "\\Pictures");
                     return JobFolderPath + "\\Pictures";
                 }
             }
         }
-        public ObservableCollection<string> PhotoPaths
+        public ObservableCollection<string> PhotoPaths  //List of paths to most recent pictures in current Job folder, to display along bottom of app
         {
             get
             {
@@ -155,27 +167,30 @@ namespace SortPix.ViewModels
                 OnPropertyChanged(nameof(PhotoPaths));
             }
         }
-        public string SelectedPhoto { get; set; }
-        public bool MoveToSubfolder { get; set; }
-        public bool StartAtRight { get; set; }
+        public string SelectedPhoto { get; set; }   //Which photo is currently selected
+        public bool MoveToSubfolder { get; set; }   //Option to move pix to a subfolder in the job folder (created one if it doesn't exist)
+        public bool StartAtRight { get; set; }      //Option to startup app at the right of the screen, makes it easier to use with touch screen
         #endregion
 
         #region Methods
-        private void GetPhotoPathsAsync(string path)
+        private void GetPhotoPathsAsync(string path)    //set the PhotoPaths property to an ObservableCollection containing paths to the 4 most recent jpg or jpeg files in job folder, sorted from newest to oldest
         {
             
             try
             {
+                //first run the query and store results in a list, then create new ObservableCollection and set PhotoPaths to it
+                //This is important because if you do it all in one step, it freezes the UI while the query runs, even if it's running in a different thread
                 var photoPathsList = Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories).Where(s => s.ToLower().EndsWith(".jpg") || s.ToLower().EndsWith(".jpeg")).OrderByDescending(d => new FileInfo(d).CreationTime).Take(4);
                 PhotoPaths = new ObservableCollection<string>(photoPathsList);
             }
-            catch
+            catch   //if there are any errors here, just return an empty ObservableCollection
             {
                 PhotoPaths = new ObservableCollection<string>();
             }
             
         }
-        private FileSystemWatcher sourceDirWatcher;
+        //Declare file system watchers for source and destination directories
+        private FileSystemWatcher sourceDirWatcher; 
         private FileSystemWatcher destDirWatcher;
         public void MonitorSourceDir()
         {
