@@ -26,7 +26,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <AutorunEnabled>true</AutorunEnabled>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -99,7 +99,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings1.settings</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\Class1.cs" />
     <Compile Include="ViewModels\SortPixMainWindowsVM.cs" />
     <Compile Include="Views\SortPixMainWindow.xaml.cs">
       <DependentUpon>SortPixMainWindow.xaml</DependentUpon>
@@ -116,7 +115,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\JobFolder.cs" />
     <Compile Include="Models\Photo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

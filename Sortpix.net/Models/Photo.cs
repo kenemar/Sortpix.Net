@@ -11,10 +11,6 @@ namespace SortPix.Models
 {
     public class Photo
     {
-        //public Photo(string[] photosList)
-        //{
-        //    OpenSelectedPhotoCommand = new OpenSelectedPhotoCommand(SortPixMainWindowsVM);
-        //}
         public string Path { get; set; }
         public ICommand OpenSelectedPhotoCommand { get; set; }
 
